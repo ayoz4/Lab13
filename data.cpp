@@ -31,6 +31,7 @@ void Subjects::operator =(const Subjects &Subjects)
 {
     setName(Subjects.getName());
     setSemester(Subjects.getSemester());
+    setTime(Subjects.getTime());
     setTeacher(Subjects.getTeacher());
 }
 

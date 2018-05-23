@@ -41,8 +41,11 @@ bool MainWindow::Connect(QString subject, QString student)
     int res = 0;
     for(int i = 0; i < VecA.size(); i++)
     {
-        indStudent = i;
-        res++;
+        if(VecA.at(i).getName() == subject)
+        {
+            indStudent = i;
+            res++;
+        }
     }
 
     int indSubject;
@@ -59,6 +62,11 @@ bool MainWindow::Connect(QString subject, QString student)
     {
         return false;
     }
+    QVector<Subjects>::iterator itA = VecA.begin() + indStudent;
+    itA->connect(subject);
+    QVector<Students>::iterator itF = VecF.begin() + indSubject;
+    itF->connect(student);
+    return true;
 }
 
 bool MainWindow::CheckClones(bool VecNumber, QString _name)
@@ -93,7 +101,9 @@ void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫ�
     QStringList list;
     list << "Предмет" << "Кол-во часов" << "Номер семстра" << "Имя преподавателя";
     ui->firstList->setHorizontalHeaderLabels(list);
-    ui->firstList->setColumnWidth(0, (ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent) / 2);
+    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
+    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
     Subjects Obj = VecA.at(row);
     tmp = Obj.getConnections();
     for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
@@ -108,8 +118,8 @@ void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫ�
                 IndSubject = i;
             }
         }
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecA.at(IndSubject).getTime()));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(VecA.at(IndSubject).getSemester()));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getTime())));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getSemester())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecA.at(IndSubject).getTeacher()));
     }
     ui->firstList->horizontalHeader()->setStretchLastSection(1);
@@ -125,7 +135,9 @@ void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///�
     QStringList list;
     list << " ФИО" << "Пол" << "Дата зачетки" << "№ Зачетки";
     ui->firstList->setHorizontalHeaderLabels(list);
-    ui->firstList->setColumnWidth(0, (ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent) / 2);
+    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
+    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
     Students Obj = VecF.at(row);
     tmp = Obj.getConnections();
     for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
@@ -141,8 +153,8 @@ void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///�
             }
         }
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(VecF.at(IndStudent).getBorn()));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecF.at(IndStudent).getNumber()));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
     }
     ui->firstList->horizontalHeader()->setStretchLastSection(1);
 }
@@ -195,12 +207,12 @@ void MainWindow::updateGeometry()
 
 void MainWindow::updateData()
 {
-    ui->StudentsWidget->clear();
+    ui->SubjectsWidget->clear();
     ui->StudentsWidget->clear();
     ui->firstList->setRowCount(0);
     ui->firstList->setColumnCount(0);
 
-    if(VecA.empty())
+    if(VecA.empty() && VecF.empty() )
     {
         return;
     }
@@ -209,13 +221,13 @@ void MainWindow::updateData()
     {
         QString Name = it->getName();
         ui->SubjectsWidget->addItem(Name);
-        QObject::connect(ui->SubjectsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsSubject(QModelIndex)));
+        QObject::connect(ui->SubjectsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsStudent(QModelIndex)));
     }
     for(QVector<Students>::iterator it = VecF.begin(); it != VecF.end(); it++)
     {
         QString Name = it->getName();
         ui->StudentsWidget->addItem(Name);
-        QObject::connect(ui->StudentsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsStudent(QModelIndex)));
+        QObject::connect(ui->StudentsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsSubject(QModelIndex)));
     }
 }
 
@@ -258,10 +270,12 @@ void MainWindow::on_addButton_clicked()
             if(ui->SubjectsSemesterEdit->text().isEmpty())
             {
                 ui->errBrowser->setText("Номер семестра указан некорректно");
+                return;
             }
             if(ui->SubjectsTeacherNameEdit->text().isEmpty())
             {
                 ui->errBrowser->setText("Имя преподавателя указано некорректно");
+                return;
             }
             Subjects *subject = new Subjects;
             subject->setName(name);
@@ -273,6 +287,7 @@ void MainWindow::on_addButton_clicked()
         else
         {
             ui->errBrowser->setText("Такой предмет уже добавлен");
+            return;
         }
     }
     else if(ToAdd == 2)
@@ -300,6 +315,7 @@ void MainWindow::on_addButton_clicked()
         else
         {
             ui->errBrowser->setText("Такой студент уже добавлен");
+            return;
         }
     }
     updateData();
@@ -307,5 +323,10 @@ void MainWindow::on_addButton_clicked()
 
 void MainWindow::on_conButton_clicked()
 {
-
+    ui->errBrowser->setText("");
+    if(!Connect(ui->ConPortEdit->text(), ui->ConFlightEdit->text()))
+    {
+        ui->errBrowser->setText("Не удалось\nнайти\nэлементы");
+    }
+    updateData();
 }
