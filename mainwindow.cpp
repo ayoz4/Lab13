@@ -99,7 +99,45 @@ void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫ�
     QSet <QString> tmp;
     ui->firstList->setColumnCount(4);
     QStringList list;
-    list << "Предмет" << "Кол-во часов" << "Номер семстра" << "Имя преподавателя";
+    list << "ФИО" << "Пол" << "Дата рождения" << "№ Зачетки";
+    ui->firstList->setHorizontalHeaderLabels(list);
+    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
+    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    Students Obj = VecF.at(row);
+    tmp = Obj.getConnections();
+    for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
+    {
+        ui->firstList->insertRow(ui->firstList->rowCount());
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 0, new QTableWidgetItem(*it));
+        int IndStudent = 0;
+        for(int i = 0; i < VecF.size(); i++)
+        {
+            if(VecF.at(i).getName() == *it)
+            {
+                IndStudent = i;
+            }
+        }
+        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(QString::number(VecF.at(IndSubject).getTime())));
+        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndSubject).getSemester())));
+        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecF.at(IndSubject).getTeacher()));
+
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
+    }
+    ui->firstList->horizontalHeader()->setStretchLastSection(1);
+}
+
+void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СТУДЕНТОВ
+{
+    ui->errBrowser->setText("");
+    ui->firstList->setRowCount(0);
+    int row = Qindex.row();
+    QSet <QString> tmp;
+    ui->firstList->setColumnCount(4);
+    QStringList list;
+    list << "Предмет" << "Кол-во часов" << "Номер семестра" << "Имя преподавателя";
     ui->firstList->setHorizontalHeaderLabels(list);
     ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
     ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
@@ -121,40 +159,6 @@ void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫ�
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getTime())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getSemester())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecA.at(IndSubject).getTeacher()));
-    }
-    ui->firstList->horizontalHeader()->setStretchLastSection(1);
-}
-
-void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СТУДЕНТОВ
-{
-    ui->errBrowser->setText("");
-    ui->firstList->setRowCount(0);
-    int row = Qindex.row();
-    QSet <QString> tmp;
-    ui->firstList->setColumnCount(4);
-    QStringList list;
-    list << " ФИО" << "Пол" << "Дата зачетки" << "№ Зачетки";
-    ui->firstList->setHorizontalHeaderLabels(list);
-    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
-    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
-    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
-    Students Obj = VecF.at(row);
-    tmp = Obj.getConnections();
-    for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
-    {
-        ui->firstList->insertRow(ui->firstList->rowCount());
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 0, new QTableWidgetItem(*it));
-        int IndStudent = 0;
-        for(int i = 0; i < VecF.size(); i++)
-        {
-            if(VecF.at(i).getName() == *it)
-            {
-                IndStudent = i;
-            }
-        }
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
     }
     ui->firstList->horizontalHeader()->setStretchLastSection(1);
 }
@@ -221,13 +225,13 @@ void MainWindow::updateData()
     {
         QString Name = it->getName();
         ui->SubjectsWidget->addItem(Name);
-        QObject::connect(ui->SubjectsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsStudent(QModelIndex)));
+        QObject::connect(ui->SubjectsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsSubject(QModelIndex)));
     }
     for(QVector<Students>::iterator it = VecF.begin(); it != VecF.end(); it++)
     {
         QString Name = it->getName();
         ui->StudentsWidget->addItem(Name);
-        QObject::connect(ui->StudentsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsSubject(QModelIndex)));
+        QObject::connect(ui->StudentsWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showRelationsStudent(QModelIndex)));
     }
 }
 
