@@ -118,10 +118,6 @@ void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫ�
                 IndStudent = i;
             }
         }
-        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(QString::number(VecF.at(IndSubject).getTime())));
-        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndSubject).getSemester())));
-        //ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecF.at(IndSubject).getTeacher()));
-
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
@@ -371,3 +367,265 @@ void MainWindow::on_disconButton_clicked()
     itF->disconnect(StudName);
     updateData();
 }
+
+/*void MainWindow::readFile(QString dir)
+{
+    QString res = "";
+    QString name = "";
+    VecA.clear();
+    VecF.clear();
+    QSet <QString> Settmp;
+    QFile file(dir);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QTextStream inputStream(&file);
+
+        ui->errBrowser->setText("");
+        bool ReadSubj = false;
+        bool ReadStud = false;
+        bool ReadConnect = false;
+        bool ReadContinue = false;
+
+        short StepSubj = 0;
+        short StepStud = 0;
+        short StepConnects = 0;
+
+        QString SubjName = "";
+        int SubjTime = 0;
+        int Semester = 0;
+        QString Teacher = "";
+
+        QString StudName = "";
+        QString Pol = "";
+        int Born = 0;
+        int Number = 0;
+
+        QString ConnectionPort = "";
+
+        while(!inputStream.atEnd())
+        {
+            res = inputStream.readLine();
+            if(ReadContinue)
+            {
+                if(ReadSubj)
+                {
+                    if(StepSubj == 0)
+                    {
+                        StudName = res;
+                        StepSubj++;
+                    }
+                    else if(StepSubj == 1)
+                    {
+                        SubjTime = res;
+                        StepSubj++;
+                        if(CheckClones(0, res))
+                        {
+                            Subjects *Subj = new Subjects();
+                            Subj->setName(StudName);
+                            Subj->setSemester(Semester);
+                            Subj->setTeacher(Teacher);
+                            Subj->setTime(SubjTime);
+                            VecA.push_back(*Subj);
+                        }
+                        ReadContinue = false;
+                        StepSubj = 0;
+                    }
+                }
+                else if(ReadStud)
+                {
+                    if(StepStud == 0)
+                    {
+                        StudName = res;
+                        StepStud++;
+                    }
+                    else if(StepStud == 1)
+                    {
+                        if(CheckTime(res))
+                        {
+                            Born = res;
+                        }
+                        else
+                        {
+                            ui->errBrowser->setText("Ошибка\nполучения\nвремени");
+                            return;
+                        }
+                        StepStud++;
+                    }
+                    else if(StepStud == 2)
+                    {
+                        if(CheckTime(res))
+                        {
+                            Pol = res.toStdString();
+                        }
+                        else
+                        {
+                            ui->errBrowser->setText("Ошибка\nполучения\nвремени");
+                            return;
+                        }
+                        StepStud++;
+                    }
+                    else if(StepStud == 3)
+                    {
+                        Number = res;
+                        StepStud++;
+                        if(CheckClones(0, res))
+                        {
+                            Students *Student = new Students();
+                            Student->setName(StudName);
+                            Student->setBorn(Born);
+                            Student->setPol(Pol);
+                            Student->setNumber(Number);
+                            VecF.push_back(*Student);
+                        }
+                        ReadContinue = false;
+                        StepStud = 0;
+                    }
+                }
+                else if(ReadConnect)
+                {
+                    if(StepConnects == 0)
+                    {
+                        ConnectionPort = res;
+                        StepConnects++;
+                    }
+                    else
+                    {
+                        if(res == ">airports")
+                        {
+                            ReadSubj = true;
+                            ReadStud = false;
+                            ReadConnect = false;
+                            ReadContinue = true;
+                            StepSubj = 0;
+                        }
+                        else if(res == ">flights")
+                        {
+                            ReadSubj = false;
+                            ReadStud = true;
+                            ReadConnect = false;
+                            ReadContinue = true;
+                            StepStud = 0;
+                        }
+                        else if(res == ">connections")
+                        {
+                            ReadSubj = false;
+                            ReadStud = false;
+                            ReadConnect = true;
+                            ReadContinue = true;
+                            StepConnects = 0;
+                        }
+                        else if(res == "")
+                        {
+                            ConnectionPort = "";
+                            StepConnects = 0;
+                        }
+                        else
+                        {
+                            if(!Connect(ConnectionPort, res))
+                            {
+                                ui->errBrowser->setText("Ошибка\nполучения\nсвязей");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if(res == ">airports")
+                {
+                    ReadSubj = true;
+                    ReadStud = false;
+                    ReadConnect = false;
+                    ReadContinue = true;
+                    StepSubj = 0;
+                }
+                else if(res == ">flights")
+                {
+                    ReadSubj = false;
+                    ReadStud = true;
+                    ReadConnect = false;
+                    ReadContinue = true;
+                    StepStud = 0;
+                }
+                else if(res == ">connections")
+                {
+                    ReadSubj = false;
+                    ReadStud = false;
+                    ReadConnect = true;
+                    ReadContinue = true;
+                    StepConnects = 0;
+                }
+                else if(res == "")
+                {
+                    ReadContinue = true;
+                    StepSubj = 0;
+                    StepStud = 0;
+                    StepConnects = 0;
+                }
+                else
+                {
+                    ui->errBrowser->setText("Ошибка\nчтения\nфайла");
+                    return;
+                }
+            }
+        }
+        if(inputStream.status() != QTextStream::Ok)
+        {
+            ui->errBrowser->setText("Ошибка\nоткрытия\nфайла");
+        }
+        updateData();
+    }
+    else
+    {
+        ui->errBrowser->setText("Ошибка\nчтения\nфайла");
+    }
+}
+
+void MainWindow::on_save_triggered()
+{
+    FILE *fout = fopen("output.txt", "w");
+    if(fout)
+    {
+        fprintf(fout, ">subjects\n");
+        for(int i = 0; i < VecA.size(); i++)
+        {
+            string Name = VecA.at(i).getName().toStdString();
+            int Semester = VecA.at(i).getSemester();
+            int Time = VecA.at(i).getTime();
+            string Teacher = VecA.at(i).getTeacher().toStdString();
+            fprintf(fout, "%s\n%s\n%s\n%s\n", Name.c_str(), Semester, Time, Teacher.c_str());
+            if(i < VecA.size() - 1)
+            {
+                fprintf(fout, "\n");
+            }
+        }
+        fprintf(fout, ">students\n");
+        for(int i = 0; i < VecF.size(); i++)
+        {
+            fprintf(fout, "%s\n%s\n%s\n%s\n", VecF.at(i).getName().toStdString().c_str(),
+                                      VecF.at(i).getBorn(),
+                                      VecF.at(i).getNumber(),
+                                      VecF.at(i).getPol().toStdString().c_str());
+            if(i < VecF.size() - 1)
+            {
+                fprintf(fout, "\n");
+            }
+        }
+        fprintf(fout, ">connections\n");
+        for(int i = 0; i < VecA.size(); i++)
+        {
+            fprintf(fout, "%s\n", VecA.at(i).getName().toStdString().c_str());
+            foreach (QString StudentName, VecA.at(i).getConnections())
+            {
+
+                fprintf(fout, "%s\n", (StudentName.toStdString().c_str()));
+            }
+            if(i < VecA.size() - 1)
+            {
+                fprintf(fout, "\n");
+            }
+        }
+        fclose(fout);
+    }
+}*/
