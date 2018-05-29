@@ -43,6 +43,8 @@ private slots:
     void on_conButton_clicked();
 
 
+    void on_disconButton_clicked();
+
 private:
     short ToAdd;
     Ui::MainWindow *ui;

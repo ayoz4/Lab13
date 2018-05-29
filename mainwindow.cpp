@@ -334,3 +334,40 @@ void MainWindow::on_conButton_clicked()
     }
     updateData();
 }
+
+
+void MainWindow::on_disconButton_clicked()
+{
+    ui->errBrowser->setText("");
+    int IndSubj;
+    QString SubjName = ui->ConPortEdit->text();
+    QString StudName = ui->ConFlightEdit->text();
+    int res = 0;
+    for(int i = 0; i < VecA.size(); i++)
+    {
+        if(VecA.at(i).getName() == SubjName)
+        {
+            IndSubj = i;
+            res++;
+        }
+    }
+    int IndStud;
+    for(int i = 0; i < VecF.size(); i++)
+    {
+        if(VecF.at(i).getName() == StudName)
+        {
+            IndStud = i;
+            res++;
+        }
+    }
+    if(res != 2)
+    {
+        ui->errBrowser->setText("Не удалось найти элементы");
+        return;
+    }
+    QVector<Subjects>::iterator itA = VecA.begin() + IndSubj;
+    itA->disconnect(SubjName);
+    QVector<Students>::iterator itF = VecF.begin() + IndStud;
+    itF->disconnect(StudName);
+    updateData();
+}
