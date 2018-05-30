@@ -22,19 +22,6 @@ MainWindow::~MainWindow()
 }
 
 
-
-void MainWindow::on_ExitButton_clicked()                ///КНОПКА ВЫХОДА
-{
-    Dialog *DialogWindow = new Dialog();
-    DialogWindow->exec();
-
-    ui->errBrowser->setText("");
-    if(DialogWindow->GetClose())
-    {
-        this->close();
-    }
-}
-
 bool MainWindow::Connect(QString subject, QString student)
 {
     int indStudent;
@@ -63,9 +50,9 @@ bool MainWindow::Connect(QString subject, QString student)
         return false;
     }
     QVector<Subjects>::iterator itA = VecA.begin() + indStudent;
-    itA->connect(subject);
+    itA->connect(student);
     QVector<Students>::iterator itF = VecF.begin() + indSubject;
-    itF->connect(student);
+    itF->connect(subject);
     return true;
 }
 
@@ -92,53 +79,19 @@ bool MainWindow::CheckClones(bool VecNumber, QString _name)
     return true;
 }
 
-void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫВЕСТИ НА ЭКРАН ПРЕДМЕТЫ
+void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СТУДЕНТОВ
 {
     ui->firstList->setRowCount(0);
     int row = Qindex.row();
     QSet <QString> tmp;
     ui->firstList->setColumnCount(4);
     QStringList list;
-    list << "ФИО" << "Пол" << "Дата рождения" << "№ Зачетки";
+    list << "Предмет" << "Кол-во часов" << "Номер семстра" << "Имя преподавателя";
     ui->firstList->setHorizontalHeaderLabels(list);
     ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
     ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
     ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
     Students Obj = VecF.at(row);
-    tmp = Obj.getConnections();
-    for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
-    {
-        ui->firstList->insertRow(ui->firstList->rowCount());
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 0, new QTableWidgetItem(*it));
-        int IndStudent = 0;
-        for(int i = 0; i < VecF.size(); i++)
-        {
-            if(VecF.at(i).getName() == *it)
-            {
-                IndStudent = i;
-            }
-        }
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
-        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
-    }
-    ui->firstList->horizontalHeader()->setStretchLastSection(1);
-}
-
-void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СТУДЕНТОВ
-{
-    ui->errBrowser->setText("");
-    ui->firstList->setRowCount(0);
-    int row = Qindex.row();
-    QSet <QString> tmp;
-    ui->firstList->setColumnCount(4);
-    QStringList list;
-    list << "Предмет" << "Кол-во часов" << "Номер семестра" << "Имя преподавателя";
-    ui->firstList->setHorizontalHeaderLabels(list);
-    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
-    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
-    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
-    Subjects Obj = VecA.at(row);
     tmp = Obj.getConnections();
     for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
     {
@@ -155,6 +108,40 @@ void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///�
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getTime())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecA.at(IndSubject).getSemester())));
         ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(VecA.at(IndSubject).getTeacher()));
+    }
+    ui->firstList->horizontalHeader()->setStretchLastSection(1);
+}
+
+void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫВЕСТИ НА ЭКРАН ПРЕДМЕТЫ
+{
+    ui->errBrowser->setText("");
+    ui->firstList->setRowCount(0);
+    int row = Qindex.row();
+    QSet <QString> tmp;
+    ui->firstList->setColumnCount(4);
+    QStringList list;
+    list << " ФИО" << "Пол" << "Дата зачетки" << "№ Зачетки";
+    ui->firstList->setHorizontalHeaderLabels(list);
+    ui->firstList->setColumnWidth(0, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 3);
+    ui->firstList->setColumnWidth(1, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    ui->firstList->setColumnWidth(2, ((ui->firstList->width()) - qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent)) / 6);
+    Subjects Obj = VecA.at(row);
+    tmp = Obj.getConnections();
+    for(QSet<QString>::Iterator it = tmp.begin(); it != tmp.end(); it++)
+    {
+        ui->firstList->insertRow(ui->firstList->rowCount());
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 0, new QTableWidgetItem(*it));
+        int IndStudent = 0;
+        for(int i = 0; i < VecF.size(); i++)
+        {
+            if(VecF.at(i).getName() == *it)
+            {
+                IndStudent = i;
+            }
+        }
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 1, new QTableWidgetItem(VecF.at(IndStudent).getPol()));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 2, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getBorn())));
+        ui->firstList->setItem(ui->firstList->rowCount() - 1, 3, new QTableWidgetItem(QString::number(VecF.at(IndStudent).getNumber())));
     }
     ui->firstList->horizontalHeader()->setStretchLastSection(1);
 }
@@ -368,7 +355,7 @@ void MainWindow::on_disconButton_clicked()
     updateData();
 }
 
-/*void MainWindow::readFile(QString dir)
+void MainWindow::readFile(QString dir)
 {
     QString res = "";
     QString name = "";
@@ -416,7 +403,7 @@ void MainWindow::on_disconButton_clicked()
                     }
                     else if(StepSubj == 1)
                     {
-                        SubjTime = res;
+                        SubjTime = res.toInt();
                         StepSubj++;
                         if(CheckClones(0, res))
                         {
@@ -442,7 +429,7 @@ void MainWindow::on_disconButton_clicked()
                     {
                         if(CheckTime(res))
                         {
-                            Born = res;
+                            Born = res.toInt();
                         }
                         else
                         {
@@ -455,7 +442,7 @@ void MainWindow::on_disconButton_clicked()
                     {
                         if(CheckTime(res))
                         {
-                            Pol = res.toStdString();
+                            Pol = res;
                         }
                         else
                         {
@@ -466,7 +453,7 @@ void MainWindow::on_disconButton_clicked()
                     }
                     else if(StepStud == 3)
                     {
-                        Number = res;
+                        Number = res.toInt();
                         StepStud++;
                         if(CheckClones(0, res))
                         {
@@ -628,4 +615,4 @@ void MainWindow::on_save_triggered()
         }
         fclose(fout);
     }
-}*/
+}

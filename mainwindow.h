@@ -25,12 +25,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void updateData();
-//    void readFile(QString dir = "input.dat");
+    void readFile(QString dir = "input.dat");
     bool CheckClones(bool VecNumber, QString _name);
     bool Connect(QString SubjName, QString StudName);
 
 private slots:
-    void on_ExitButton_clicked();
     void HideSubj(bool value);
     void HideStud(bool value);
     void showRelationsSubject(QModelIndex Qindex);
@@ -44,7 +43,7 @@ private slots:
 
     void on_disconButton_clicked();
 
-//    void on_save_triggered();
+    void on_save_triggered();
 
 private:
     short ToAdd;
