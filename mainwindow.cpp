@@ -571,7 +571,8 @@ void MainWindow::on_OpenAction_triggered()
     QString dir = QFileDialog::getOpenFileName();
     readFile(dir);
 }
-/*void MainWindow::on_save_triggered()                                        ///СОХРАНИТЬ В ФАЙЛ
+
+void MainWindow::on_save_triggered()                                        ///СОХРАНИТЬ В ФАЙЛ
 {
     FILE *fout = fopen("output.txt", "w");
     if(fout)
@@ -617,4 +618,4 @@ void MainWindow::on_OpenAction_triggered()
         }
         fclose(fout);
     }
-}*/
+}
