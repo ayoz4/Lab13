@@ -43,7 +43,10 @@ private slots:
 
     void on_disconButton_clicked();
 
-    void on_save_triggered();
+//    void on_save_triggered();
+
+    void on_OpenAction_triggered();
+
 
 private:
     short ToAdd;

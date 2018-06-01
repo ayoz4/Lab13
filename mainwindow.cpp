@@ -56,7 +56,7 @@ bool MainWindow::Connect(QString subject, QString student)
     return true;
 }
 
-bool MainWindow::CheckClones(bool VecNumber, QString _name)
+bool MainWindow::CheckClones(bool VecNumber, QString _name)                     ///ПРОВЕРКА НА ОДИНАКОВЫЕ ЭЛЕМЕНТЫ
 {
     if(VecNumber)
     {
@@ -236,7 +236,7 @@ void MainWindow::on_comboBox_activated(const QString &arg1)
     updateGeometry();
 }
 
-void MainWindow::on_addButton_clicked()
+void MainWindow::on_addButton_clicked()                                     ///ДОБАВИТЬ ЭЛЕМЕНТ
 {
     ui->errBrowser->setText("");
     if(ToAdd == 1)
@@ -319,7 +319,7 @@ void MainWindow::on_conButton_clicked()
 }
 
 
-void MainWindow::on_disconButton_clicked()
+void MainWindow::on_disconButton_clicked()                                      ///УДАЛИТЬ СВЯЗЬ
 {
     ui->errBrowser->setText("");
     int IndSubj;
@@ -368,147 +368,140 @@ void MainWindow::readFile(QString dir)
         QTextStream inputStream(&file);
 
         ui->errBrowser->setText("");
-        bool ReadSubj = false;
-        bool ReadStud = false;
+        bool ReadSubject = false;
+        bool ReadStudent = false;
         bool ReadConnect = false;
         bool ReadContinue = false;
 
-        short StepSubj = 0;
-        short StepStud = 0;
+        short StepSubject = 0;
+        short StepStudent = 0;
         short StepConnects = 0;
 
-        QString SubjName = "";
-        int SubjTime = 0;
-        int Semester = 0;
-        QString Teacher = "";
+        QString SubjectName = "";
+        int SubjectHours = 0;
+        int SubjectSemester = 0;
+        QString SubjectTeacher = "";
 
-        QString StudName = "";
-        QString Pol = "";
-        int Born = 0;
-        int Number = 0;
+        QString StudentName = "";
+        QString StudentGender = "";
+        int StudentYear = 0;
+        int StudentBook = 0;
 
-        QString ConnectionPort = "";
+        QString ConnectionSubject = "";
 
         while(!inputStream.atEnd())
         {
             res = inputStream.readLine();
             if(ReadContinue)
             {
-                if(ReadSubj)
+                if(ReadSubject)
                 {
-                    if(StepSubj == 0)
+                    if(StepSubject == 0)
                     {
-                        StudName = res;
-                        StepSubj++;
+                        SubjectName = res;
+                        StepSubject++;
                     }
-                    else if(StepSubj == 1)
+                    else if(StepSubject == 1)
                     {
-                        SubjTime = res.toInt();
-                        StepSubj++;
+                        SubjectHours = res.toInt();
+                        StepSubject++;
+                    }
+                    else if(StepSubject == 2)
+                    {
+                        SubjectSemester = res.toInt();
+                        StepSubject++;
+                    }
+                    else if(StepSubject == 3)
+                    {
+                        SubjectTeacher = res;
                         if(CheckClones(0, res))
                         {
                             Subjects *Subj = new Subjects();
-                            Subj->setName(StudName);
-                            Subj->setSemester(Semester);
-                            Subj->setTeacher(Teacher);
-                            Subj->setTime(SubjTime);
+                            Subj->setName(SubjectName);
+                            Subj->setTime(SubjectHours);
+                            Subj->setSemester(SubjectSemester);
+                            Subj->setTeacher(SubjectTeacher);
                             VecA.push_back(*Subj);
                         }
                         ReadContinue = false;
-                        StepSubj = 0;
+                        StepSubject = 0;
                     }
                 }
-                else if(ReadStud)
+                else if(ReadStudent)
                 {
-                    if(StepStud == 0)
+                    if(StepStudent == 0)
                     {
-                        StudName = res;
-                        StepStud++;
+                        StudentName = res;
+                        StepStudent++;
                     }
-                    else if(StepStud == 1)
+                    else if(StepStudent == 1)
                     {
-                        if(CheckTime(res))
-                        {
-                            Born = res.toInt();
-                        }
-                        else
-                        {
-                            ui->errBrowser->setText("Ошибка\nполучения\nвремени");
-                            return;
-                        }
-                        StepStud++;
+                        StudentGender = res;
+                        StepStudent++;
                     }
-                    else if(StepStud == 2)
+                    else if(StepStudent == 2)
                     {
-                        if(CheckTime(res))
-                        {
-                            Pol = res;
-                        }
-                        else
-                        {
-                            ui->errBrowser->setText("Ошибка\nполучения\nвремени");
-                            return;
-                        }
-                        StepStud++;
+                        StudentYear = res.toInt();
+                        StepStudent++;
                     }
-                    else if(StepStud == 3)
+                    else if(StepStudent == 3)
                     {
-                        Number = res.toInt();
-                        StepStud++;
+                        StudentBook = res.toInt();
+                        StepStudent++;
                         if(CheckClones(0, res))
                         {
                             Students *Student = new Students();
-                            Student->setName(StudName);
-                            Student->setBorn(Born);
-                            Student->setPol(Pol);
-                            Student->setNumber(Number);
+                            Student->setName(StudentName);
+                            Student->setPol(StudentGender);
+                            Student->setBorn(StudentYear);
+                            Student->setNumber(StudentBook);
                             VecF.push_back(*Student);
                         }
                         ReadContinue = false;
-                        StepStud = 0;
+                        StepStudent = 0;
                     }
                 }
                 else if(ReadConnect)
                 {
                     if(StepConnects == 0)
                     {
-                        ConnectionPort = res;
+                        ConnectionSubject = res;
                         StepConnects++;
                     }
                     else
                     {
-                        if(res == ">airports")
+                        if(res == ">subject")
                         {
-                            ReadSubj = true;
-                            ReadStud = false;
+                            ReadSubject = true;
+                            ReadStudent = false;
                             ReadConnect = false;
                             ReadContinue = true;
-                            StepSubj = 0;
+                            StepSubject = 0;
                         }
-                        else if(res == ">flights")
+                        else if(res == ">student")
                         {
-                            ReadSubj = false;
-                            ReadStud = true;
+                            ReadSubject = false;
+                            ReadStudent = true;
                             ReadConnect = false;
                             ReadContinue = true;
-                            StepStud = 0;
+                            StepStudent = 0;
                         }
                         else if(res == ">connections")
                         {
-                            ReadSubj = false;
-                            ReadStud = false;
+                            ReadSubject = false;
+                            ReadStudent = false;
                             ReadConnect = true;
                             ReadContinue = true;
                             StepConnects = 0;
                         }
                         else if(res == "")
                         {
-                            ConnectionPort = "";
+                            ConnectionSubject = "";
                             StepConnects = 0;
                         }
                         else
                         {
-                            if(!Connect(ConnectionPort, res))
+                            if(!Connect(ConnectionSubject, res))
                             {
                                 ui->errBrowser->setText("Ошибка\nполучения\nсвязей");
                                 return;
@@ -519,35 +512,39 @@ void MainWindow::readFile(QString dir)
             }
             else
             {
-                if(res == ">airports")
+                if(res == ">subject")
                 {
-                    ReadSubj = true;
-                    ReadStud = false;
+                    ReadSubject = true;
+                    ReadStudent = false;
                     ReadConnect = false;
                     ReadContinue = true;
-                    StepSubj = 0;
+                    StepSubject = 0;
                 }
-                else if(res == ">flights")
+                else if(res == ">student")
                 {
-                    ReadSubj = false;
-                    ReadStud = true;
+                    ReadSubject = false;
+                    ReadStudent = true;
                     ReadConnect = false;
                     ReadContinue = true;
-                    StepStud = 0;
+                    StepStudent = 0;
                 }
                 else if(res == ">connections")
                 {
-                    ReadSubj = false;
-                    ReadStud = false;
+                    ReadSubject = false;
+                    ReadStudent = false;
                     ReadConnect = true;
                     ReadContinue = true;
                     StepConnects = 0;
                 }
                 else if(res == "")
                 {
+                    if(!ReadStudent && !ReadSubject && !ReadConnect)
+                    {
+                        continue;
+                    }
                     ReadContinue = true;
-                    StepSubj = 0;
-                    StepStud = 0;
+                    StepSubject = 0;
+                    StepStudent = 0;
                     StepConnects = 0;
                 }
                 else
@@ -569,7 +566,12 @@ void MainWindow::readFile(QString dir)
     }
 }
 
-void MainWindow::on_save_triggered()
+void MainWindow::on_OpenAction_triggered()
+{
+    QString dir = QFileDialog::getOpenFileName();
+    readFile(dir);
+}
+/*void MainWindow::on_save_triggered()                                        ///СОХРАНИТЬ В ФАЙЛ
 {
     FILE *fout = fopen("output.txt", "w");
     if(fout)
@@ -615,4 +617,4 @@ void MainWindow::on_save_triggered()
         }
         fclose(fout);
     }
-}
+}*/
