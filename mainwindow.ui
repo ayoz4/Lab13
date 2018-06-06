@@ -134,7 +134,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>60</y>
        <width>151</width>
        <height>16</height>
       </rect>
@@ -222,7 +222,7 @@
       <rect>
        <x>130</x>
        <y>20</y>
-       <width>91</width>
+       <width>101</width>
        <height>22</height>
       </rect>
      </property>
@@ -354,7 +354,7 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Связь</string>
+     <string>Настроить связь</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>

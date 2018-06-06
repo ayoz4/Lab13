@@ -4,8 +4,6 @@
 #include <QSet>
 #include <QVector>
 #include <QString>
-#include <QTime>
-
 
 bool CheckTime(QString _time);
 

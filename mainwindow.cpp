@@ -79,7 +79,7 @@ bool MainWindow::CheckClones(bool VecNumber, QString _name)                     
     return true;
 }
 
-void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СТУДЕНТОВ
+void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///ВЫВЕСТИ НА ЭКРАН СВЯЗИ СТУДЕНТОВ
 {
     ui->firstList->setRowCount(0);
     int row = Qindex.row();
@@ -112,7 +112,7 @@ void MainWindow::showRelationsStudent(QModelIndex Qindex)                   ///�
     ui->firstList->horizontalHeader()->setStretchLastSection(1);
 }
 
-void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫВЕСТИ НА ЭКРАН ПРЕДМЕТЫ
+void MainWindow::showRelationsSubject(QModelIndex Qindex)               ///ВЫВЕСТИ НА ЭКРАН СВЯЗИ ПРЕДМЕТЫ
 {
     ui->errBrowser->setText("");
     ui->firstList->setRowCount(0);
